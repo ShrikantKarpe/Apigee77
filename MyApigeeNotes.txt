@@ -1,1 +1,74 @@
 Apigee Notes :  
+
+LoadBalancer Options: 
+
+RoundRobin  -  1 - 2 -1 -2 requests on servers
+
+	         <TargetEndPoint name= "default"> 
+		<HTTPTargetConnection>
+		<LoadBalancer>
+			<Algorithm>RoundRobin</Algorithm>
+			<Server name="target 1"/>
+			<Server name="target 2"/>
+		</LoadBalancer>
+		<Path>/test</Path>
+		</HTTPTargetConnection>
+	         </TargetEndPoint>
+
+
+Weighted-  1 request on server 1  , 2 requests on server 2 and 3 requests on server 3
+
+
+	          <TargetEndPoint name= "default"> 
+		<HTTPTargetConnection>
+		<LoadBalancer>
+			<Algorithm>Weighted</Algorithm>
+			<Server name="target 1"> <Weight> 1 </Weight>  </Server>
+			<Server name="target 2"/> <Weight> 2 </Weight>  </Server>
+			<Server name="target 3"/> <Weight> 3 </Weight>  </Server>
+		</LoadBalancer>
+		<Path>/test</Path>
+		</HTTPTargetConnection>
+	         </TargetEndPoint>
+
+LeastConnection -  Routes the requests to the server who has fewest HTTP connections open
+
+	         <TargetEndPoint name= "default"> 
+		<HTTPTargetConnection>
+		<LoadBalancer>
+			<Algorithm>LeastConnection</Algorithm>
+			<Server name="target 1"/>
+			<Server name="target 2"/>
+		</LoadBalancer>
+		<Path>/test</Path>
+		</HTTPTargetConnection>
+	         </TargetEndPoint>
+
+
+--  MaximunFailures -  Option of <MaximumFailures>5 </ MaximumFailures> removes the server from algorithm if the requests fails on any of the server for 5 times. 
+	Remember , once the server is removed it can't be automatically added even if it's up and running. You must redeploy the procxy to make the server available again.  You can also use "HealthMonitoring" option.
+
+
+-- Retry - Retry the request once to a different server after an I/O error (not an HTTP status code 500).
+	<RetryEnabled>true</RetryEnabled>
+
+-- IsFallBack
+	One (and only one) TargetServer can be set as the 'fallback' server. The fallback TargetServer is not included in load balancing routines until all other TargetServers are identified as unavailable by the load balancer. When the load balancer determines that all TargetServers are unavailable, all traffic is routed to the fallback server.
+
+	In below example target 3 server is set as fallback server.
+
+<TargetEndpoint name="default">
+  <HTTPTargetConnection>
+      <LoadBalancer>
+        <Algorithm>RoundRobin</Algorithm>
+        <Server name="target1" />
+        <Server name="target2" />
+        <Server name="target3">
+          <IsFallback>true</IsFallback>
+        </Server>
+      </LoadBalancer>
+      <Path>/test</Path>
+  </HTTPTargetConnection>
+</TargetEndpoint>
+
+
